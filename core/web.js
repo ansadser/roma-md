@@ -24,6 +24,7 @@ small{display:block;margin-top:14px;color:#71717a;line-height:1.5}
 <input id="phone" inputmode="numeric" placeholder="Phone number + country code">
 <button id="pair">Get Pairing Code</button>
 <div id="code" class="code"></div>
+<button id="copy" style="display:none">Copy Pairing Code</button>
 </div>
 <small>QR scan: WhatsApp → Linked devices → Link a device.<br>Pairing: Linked devices → Link with phone number instead.</small>
 </main>
@@ -36,7 +37,7 @@ async function refresh(){
   $('status').className='status '+(d.status==='connected'?'ok':d.status==='error'?'err':'warn');
   $('qr').style.display=d.qr?'block':'none';if(d.qr)$('qr').src=d.qr;
   $('pairArea').style.display=d.status==='connected'?'none':'block';
-  if(d.pairingCode)$('code').textContent=d.pairingCode;
+  if(d.pairingCode){$('code').textContent=d.pairingCode;$('copy').style.display='block'}
  }catch(e){}
 }
 $('pair').onclick=async()=>{
@@ -48,6 +49,11 @@ $('pair').onclick=async()=>{
   if(!d.ok)throw new Error(d.error);$('code').textContent=d.code;
  }catch(e){alert(e.message||'Pairing failed')}
  finally{$('pair').disabled=false;$('pair').textContent='Get Pairing Code'}
+};
+$('copy').onclick=async()=>{
+ const code=$('code').textContent.trim();
+ if(!code)return;
+ try{await navigator.clipboard.writeText(code);$('copy').textContent='Copied ✓';setTimeout(()=>$('copy').textContent='Copy Pairing Code',1500)}catch(e){alert('Copy failed — long press and copy the code.')}
 };
 refresh();setInterval(refresh,1500);
 </script></body></html>`;
