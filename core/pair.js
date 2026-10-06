@@ -29,7 +29,7 @@ function normalizeMessage(m){
 }
 export function onMessage(fn){messageHandler=fn}
 export function getSocket(){return sock}
-export async function sessionInfo(){return {connected:state.status==="connected",status:state.status,userJid:state.userJid,pairingCode:state.pairingCode||"",hasQr:!!state.qr,qr:state.qrDataUrl||null}}
+export async function connectionInfo(){return {connected:state.status==="connected",status:state.status,userJid:state.userJid,pairingCode:state.pairingCode||"",hasQr:!!state.qr,qr:state.qrDataUrl||null}}
 export async function getBotJid(){return state.userJid}
 
 export async function sendMessage(to,text,mentions=[]){
@@ -54,7 +54,6 @@ export async function requestPairingCode(phone){
   if(state.status==="connected"||sock.authState?.creds?.registered)throw new Error("Already connected");
   const number=String(phone||"").replace(/\D/g,"");
   if(!/^\d{7,15}$/.test(number))throw new Error("Enter a valid phone number with country code");
-  if(!state.qr)throw new Error("Pairing is not ready yet. Wait a few seconds and try again.");
   const code=await sock.requestPairingCode(number);
   state.pairingCode=String(code||"").replace(/(.{4})/,"$1-");
   return state.pairingCode;
