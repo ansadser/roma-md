@@ -1,6 +1,6 @@
 import http from "node:http";
 import {config} from "../config.js";
-import {requestPairingCode,sessionInfo,state} from "./pair.js";
+import {requestPairingCode,connectionInfo,state} from "./pair.js";
 
 const html=String.raw\`<!doctype html>
 <html lang="en"><head>
@@ -68,7 +68,7 @@ export function startWebServer(){
         res.writeHead(200,{"content-type":"text/html; charset=utf-8"});return res.end(html);
       }
       if(req.method==="GET"&&url.pathname==="/api/status"){
-        res.writeHead(200,{"content-type":"application/json"});return res.end(JSON.stringify(await sessionInfo()));
+        res.writeHead(200,{"content-type":"application/json"});return res.end(JSON.stringify(await connectionInfo()));
       }
       if(req.method==="POST"&&url.pathname==="/api/pair"){
         let body="";for await(const chunk of req)body+=chunk;
