@@ -15,8 +15,6 @@ services:
         value: "10000"
       - key: OWNER_NUMBER
         sync: false
-      - key: WEB_TOKEN
-        sync: false
       - key: PREFIX
         value: "."
       - key: MODE
