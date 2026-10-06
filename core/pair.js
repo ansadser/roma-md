@@ -75,7 +75,8 @@ export async function startWhatsApp(){
       auth:authState,
       browser:Browsers.ubuntu(config.botName),
       markOnlineOnConnect:false,
-      syncFullHistory:false
+      syncFullHistory:false,
+      printQRInTerminal:false
     });
     state.status=authState.creds.registered?"connecting":"waiting";
     state.lastError="";
