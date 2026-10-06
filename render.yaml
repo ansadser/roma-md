@@ -4,6 +4,10 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
+    disk:
+      name: roma-auth
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: AUTH_DIR
         value: /var/data/auth_info_baileys
