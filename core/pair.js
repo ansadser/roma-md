@@ -1,4 +1,4 @@
-import makeWASocket,{DisconnectReason,makeCacheableSignalKeyStore,fetchLatestWaWebVersion,initAuthCreds} from "@whiskeysockets/baileys";
+import makeWASocket,{DisconnectReason,makeCacheableSignalKeyStore,fetchLatestWaWebVersion,initAuthCreds,proto} from "@whiskeysockets/baileys";
 import {Boom} from "@hapi/boom";
 import crypto from "node:crypto";
 import mongoose from "mongoose";
@@ -9,6 +9,7 @@ let sock=null;
 let reconnecting=false;
 let messageHandler=null;
 let mongoReady=false;
+const writeQueues=new Map();
 
 export const state={status:"starting",qr:null,qrDataUrl:null,pairingCode:null,userJid:"",lastError:""};
 
@@ -25,9 +26,26 @@ function textOf(m){
   return String(msg.conversation||msg.extendedTextMessage?.text||msg.imageMessage?.caption||msg.videoMessage?.caption||msg.documentMessage?.caption||"").trim();
 }
 function normalizeMessage(m){
-  const from=normalizeJid(m?.key?.remoteJid);
-  const sender=normalizeJid(m?.key?.participant||m?.key?.remoteJid);
-  return {id:m?.key?.id||"",from,sender,participant:sender,fromMe:!!m?.key?.fromMe,text:textOf(m),message:m?.message||{},key:m?.key||{},raw:m};
+  const key=m?.key||{};
+  const from=normalizeJid(key.remoteJid);
+  const sender=normalizeJid(key.participant||key.remoteJid);
+  const fromAlt=normalizeJid(key.remoteJidAlt||key.remoteJid);
+  const senderAlt=normalizeJid(key.participantAlt||key.remoteJidAlt||key.participant||key.remoteJid);
+  return {
+    id:key.id||"",
+    from,
+    sender,
+    participant:sender,
+    senderAlt,
+    fromAlt,
+    senderPhoneJid:senderAlt.endsWith("@s.whatsapp.net")?senderAlt:"",
+    fromPhoneJid:fromAlt.endsWith("@s.whatsapp.net")?fromAlt:"",
+    fromMe:!!key.fromMe,
+    text:textOf(m),
+    message:m?.message||{},
+    key,
+    raw:m
+  };
 }
 export function onMessage(fn){messageHandler=fn}
 export function getSocket(){return sock}
@@ -67,7 +85,11 @@ function decrypt(value){
   return Buffer.concat([decipher.update(raw.subarray(28)),decipher.final()]).toString();
 }
 function safeJson(value){
-  return JSON.stringify(value,(_,v)=>Buffer.isBuffer(v)?{type:"Buffer",data:[...v]}:v);
+  return JSON.stringify(value,(_,v)=>{
+    if(Buffer.isBuffer(v))return {type:"Buffer",data:[...v]};
+    if(v instanceof Uint8Array)return {type:"Buffer",data:[...v]};
+    return v;
+  });
 }
 function reviveJson(value){
   return JSON.parse(value,(_,v)=>v&&v.type==="Buffer"&&Array.isArray(v.data)?Buffer.from(v.data):v);
@@ -79,18 +101,32 @@ const AuthSchema=new mongoose.Schema({
 AuthSchema.index({sessionId:1,category:1,key:1},{unique:true});
 const Auth=mongoose.models.RomaAuth||mongoose.model("RomaAuth",AuthSchema);
 
+function queueWrite(queueKey,job){
+  const previous=writeQueues.get(queueKey)||Promise.resolve();
+  const next=previous.catch(()=>{}).then(job);
+  writeQueues.set(queueKey,next.finally(()=>{if(writeQueues.get(queueKey)===next)writeQueues.delete(queueKey)}));
+  return next;
+}
 async function saveAuth(sessionId,category,key,value){
-  await Auth.findOneAndUpdate(
-    {sessionId,category,key},
-    {$set:{value:encrypt(safeJson(value)),updatedAt:new Date()}},
-    {upsert:true,new:true}
-  );
+  const queueKey=sessionId+":"+category+":"+key;
+  return queueWrite(queueKey,async()=>{
+    if(value==null){
+      await Auth.deleteOne({sessionId,category,key});
+      return;
+    }
+    await Auth.findOneAndUpdate(
+      {sessionId,category,key},
+      {$set:{value:encrypt(safeJson(value)),updatedAt:new Date()}},
+      {upsert:true,new:true}
+    );
+  });
 }
 async function loadAuth(sessionId,category,key){
   const doc=await Auth.findOne({sessionId,category,key}).lean();
   return doc?reviveJson(decrypt(doc.value)):null;
 }
 async function deleteAuth(){
+  await Promise.all([...writeQueues.values()].map(p=>p.catch(()=>{})));
   await Auth.deleteMany({sessionId:config.sessionId});
 }
 
@@ -101,7 +137,11 @@ async function createAuthState(){
     keys:{
       get:async(type,ids)=>{
         const result={};
-        for(const id of ids)result[id]=await loadAuth(config.sessionId,"key",type+":"+id);
+        await Promise.all(ids.map(async id=>{
+          let value=await loadAuth(config.sessionId,"key",type+":"+id);
+          if(type==="app-state-sync-key"&&value) value=proto.Message.AppStateSyncKeyData.create(value);
+          result[id]=value;
+        }));
         return result;
       },
       set:async data=>{
@@ -113,7 +153,12 @@ async function createAuthState(){
       }
     }
   };
-  return {state:authState,saveCreds:()=>saveAuth(config.sessionId,"creds","creds",authState.creds)};
+  let lastCredSave=Promise.resolve();
+  return {
+    state:authState,
+    saveCreds:()=>{lastCredSave=lastCredSave.catch(()=>{}).then(()=>saveAuth(config.sessionId,"creds","creds",authState.creds));return lastCredSave;},
+    waitForCreds:()=>lastCredSave
+  };
 }
 
 async function ensureMongo(){
@@ -152,7 +197,7 @@ export async function startWhatsApp(){
     sock.ev.on("connection.update",async({connection,lastDisconnect})=>{
       if(connection==="open"){
         state.status="connected";state.lastError="";
-        state.userJid=normalizeJid(sock.user?.id||"");
+        state.userJid=normalizeJid(sock.user?.id||sock.user?.lid||"");
         console.log("[ROMA] WhatsApp connected as "+state.userJid);
       }
       if(connection==="close"){
