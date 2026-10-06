@@ -1,1 +1,11 @@
-services:\n  roma-md:\n    build: .\n    container_name: roma-md\n    restart: unless-stopped\n    env_file:\n      - .env\n
+services:
+  roma-md:
+    build: .
+    container_name: roma-md
+    restart: unless-stopped
+    ports:
+      - "10000:10000"
+    env_file:
+      - .env
+    volumes:
+      - ./auth_info_baileys:/app/auth_info_baileys
