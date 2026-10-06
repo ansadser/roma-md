@@ -1,7 +1,6 @@
 import {config} from "./config.js";
 import {getBotJid,onMessage,startWhatsApp,sendMessage} from "./core/pair.js";
 import {loadPlugins} from "./core/plugin.js";
-import {startWebServer} from "./core/web.js";
 
 const started=Date.now();
 let plugins=[];
@@ -40,8 +39,7 @@ async function handle(m){
 
 async function main(){
   plugins=await loadPlugins();
-  startWebServer();
-  onMessage(handle);
+    onMessage(handle);
   await startWhatsApp();
   console.log("[ROMA] Bot started • Plugins: "+plugins.length);
 }
