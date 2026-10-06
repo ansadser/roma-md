@@ -1,4 +1,4 @@
-import makeWASocket,{Browsers,DisconnectReason,useMultiFileAuthState} from "@whiskeysockets/baileys";
+import makeWASocket,{Browsers,DisconnectReason,useMultiFileAuthState,fetchLatestBaileysVersion} from "@whiskeysockets/baileys";
 import {Boom} from "@hapi/boom";
 import QRCode from "qrcode";
 import fs from "node:fs/promises";
@@ -71,7 +71,9 @@ export async function startWhatsApp(){
   try{
     await fs.mkdir(config.authDir,{recursive:true});
     const {state:authState,saveCreds}=await useMultiFileAuthState(config.authDir);
+    const {version}=await fetchLatestBaileysVersion();
     sock=makeWASocket({
+      version,
       auth:authState,
       browser:Browsers.ubuntu(config.botName),
       markOnlineOnConnect:false,
