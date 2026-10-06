@@ -1,25 +1,39 @@
-import {getSocket,sendMessage,sendImage} from "../core/pair.js";
+import {getSocket} from "../core/pair.js";
 
-const botJid=()=>getSocket()?.user?.id||"";
+const botJid=()=>getSocket()?.user?.id||getSocket()?.user?.lid||"";
 const groupOnly=ctx=>String(ctx.message?.from||"").endsWith("@g.us");
 
 async function meta(ctx){
   if(!groupOnly(ctx)) throw new Error("Group command only");
-  return ctx.socket?.groupMetadata ? ctx.socket.groupMetadata(ctx.message.from) : getSocket().groupMetadata(ctx.message.from);
+  return getSocket().groupMetadata(ctx.message.from);
 }
-function sender(ctx){return String(ctx.senderNumber||"").replace(/\D/g,"")+"@s.whatsapp.net"}
+function sender(ctx){
+  return ctx.senderJid||ctx.senderPhoneJid||(String(ctx.senderNumber||"").replace(/\D/g,"")+"@s.whatsapp.net");
+}
 function mentioned(ctx){
   const p=ctx.message?.key?.participant||ctx.message?.key?.remoteJid;
   return p?String(p).replace(/:.*?(?=@)/,""):sender(ctx);
 }
+function participantJids(p){
+  const out=[];
+  for(const v of [p?.id,p?.lid,p?.phoneNumber]) if(v) out.push(String(v).replace(/:.*?(?=@)/,""));
+  return [...new Set(out)];
+}
 async function admins(ctx){
   const m=await meta(ctx);
-  return (m.participants||[]).filter(x=>x.admin).map(x=>String(x.id).replace(/:.*?(?=@)/,""));
+  return (m.participants||[]).filter(x=>x.admin).flatMap(participantJids);
 }
 async function requireAdmin(ctx){
   const a=await admins(ctx);
-  const me=String(ctx.message?.key?.participant||ctx.message?.key?.remoteJid||"").replace(/:.*?(?=@)/,"");
-  if(!a.includes(me)&&!a.includes(String(getSocket()?.user?.id||"").replace(/:.*?(?=@)/,""))) throw new Error("Admin only");
+  const me=[
+    ctx.message?.key?.participant,
+    ctx.message?.key?.participantAlt,
+    ctx.senderJid,
+    ctx.senderPhoneJid,
+    getSocket()?.user?.id,
+    getSocket()?.user?.lid
+  ].filter(Boolean).map(x=>String(x).replace(/:.*?(?=@)/,""));
+  if(!me.some(x=>a.includes(x))) throw new Error("Admin only");
 }
 function target(ctx){
   const raw=ctx.arg?.trim();
@@ -38,9 +52,9 @@ export const commands=[
 {name:"tag",aliases:["tagall"],async run(ctx){
   await requireAdmin(ctx);
   const m=await meta(ctx);
-  const ids=(m.participants||[]).map(x=>String(x.id).replace(/:.*?(?=@)/,""));
+  const ids=(m.participants||[]).map(x=>x.id).filter(Boolean);
   const text=ctx.arg?.trim()||"📢 Mention all";
-  return ctx.reply(text,ids.map(x=>x+"@s.whatsapp.net"));
+  return ctx.reply(text,ids);
 }},
 {name:"promote",aliases:["admin"],async run(ctx){
   await requireAdmin(ctx); const s=getSocket(); const t=target(ctx);
@@ -77,7 +91,7 @@ export const commands=[
   await requireAdmin(ctx); const code=await getSocket().groupInviteCode(ctx.message.from); return ctx.reply("🔗 https://chat.whatsapp.com/"+code);
 }},
 {name:"revoke",aliases:["resetlink"],async run(ctx){
-  await requireAdmin(ctx); const code=await getSocket().groupRevokeInvite(ctx.message.from); return ctx.reply("🔄 Link revoked.");
+  await requireAdmin(ctx); await getSocket().groupRevokeInvite(ctx.message.from); return ctx.reply("🔄 Link revoked.");
 }},
 {name:"leave",aliases:["exit"],async run(ctx){
   await requireAdmin(ctx); await getSocket().groupLeave(ctx.message.from);
