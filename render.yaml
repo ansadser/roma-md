@@ -1,14 +1,17 @@
 services:
-  - type: worker
+  - type: web
     name: roma-md
     runtime: docker
     dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
     envVars:
-      - key: SESSION_ID
-        sync: false
-      - key: PAIR_WEB_URL
-        value: "https://modest-sacha-boyscro-50785a59.koyeb.app"
+      - key: AUTH_DIR
+        value: /var/data/auth_info_baileys
+      - key: PORT
+        value: "10000"
       - key: OWNER_NUMBER
+        sync: false
+      - key: WEB_TOKEN
         sync: false
       - key: PREFIX
         value: "."
