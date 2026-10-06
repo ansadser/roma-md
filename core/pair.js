@@ -31,6 +31,7 @@ function normalizeMessage(m){
 }
 export function onMessage(fn){messageHandler=fn}
 export function getSocket(){return sock}
+export function isGroupJid(jid){return String(jid||"").endsWith("@g.us")}
 export async function connectionInfo(){return {connected:state.status==="connected",status:state.status,userJid:state.userJid,sessionId:config.sessionId,lastError:state.lastError}}
 export async function getBotJid(){return state.userJid}
 
