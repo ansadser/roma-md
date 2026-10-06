@@ -4,13 +4,13 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
-    disk:
-      name: roma-auth
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
-      - key: AUTH_DIR
-        value: /var/data/auth_info_baileys
+      - key: MONGODB_URI
+        sync: false
+      - key: SESSION_ID
+        sync: false
+      - key: SESSION_ENCRYPTION_KEY
+        sync: false
       - key: PORT
         value: "10000"
       - key: OWNER_NUMBER
