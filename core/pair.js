@@ -75,7 +75,6 @@ export async function startWhatsApp(){
     sock=makeWASocket({
       version,
       auth:authState,
-      browser:Browsers.ubuntu(config.botName),
       markOnlineOnConnect:false,
       syncFullHistory:false,
       printQRInTerminal:false
