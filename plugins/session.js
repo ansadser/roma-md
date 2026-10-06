@@ -6,18 +6,15 @@ export const commands=[{
   async run(ctx){
     try{
       const d=await sessionInfo();
-      const connected=d?.connected===true||d?.status==="connected"||d?.session?.connected===true;
-      const jid=d?.userJid||d?.session?.userJid||d?.jid||"Unknown";
       return ctx.reply(
-        "╭━━〔 *SESSION* 〕━━╮\n"+
-        "┃ Status : "+(connected?"🟢 Connected":"🔴 Disconnected")+"\n"+
-        "┃ ID     : "+ctx.config.sessionId+"\n"+
-        "┃ JID    : "+jid+"\n"+
+        "╭━━〔 *CONNECTION* 〕━━╮\n"+
+        "┃ Status : "+(d.connected?"🟢 Connected":"🔴 Disconnected")+"\n"+
+        "┃ JID    : "+(d.userJid||"Unknown")+"\n"+
         "╰━━━━━━━━━━━━━━╯"
       );
     }catch(e){
-      console.error("[ROMA] session command:",e?.message||e);
-      return ctx.reply("❌ Session status fetch failed.");
+      console.error("[ROMA] connection command:",e?.message||e);
+      return ctx.reply("❌ Connection status fetch failed.");
     }
   }
 }];
