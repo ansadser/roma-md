@@ -1,9 +1,9 @@
 import {config} from "./config.js";
-import {getMessages,sendMessage,getBotJid,sessionInfo} from "./core/pair.js";
+import {getBotJid,onMessage,startWhatsApp,sendMessage} from "./core/pair.js";
 import {loadPlugins} from "./core/plugin.js";
+import {startWebServer} from "./core/web.js";
 
 const started=Date.now();
-let cursor=0,busy=false,lastState="";
 let plugins=[];
 
 const numberOf=v=>String(v||"").split("@")[0].split(":")[0].replace(/\D/g,"");
@@ -16,9 +16,9 @@ async function allowed(sender){
 }
 
 async function handle(m){
-  const text=String(m?.text||m?.message?.text||"").trim();
+  const text=String(m?.text||"").trim();
   if(!text.startsWith(config.prefix))return;
-  const sender=numberOf(m.from||m.sender||m.participant);
+  const sender=numberOf(m.sender||m.from);
   if(!(await allowed(sender)))return;
 
   const receivedAt=Date.now();
@@ -38,36 +38,11 @@ async function handle(m){
   await command.run(ctx);
 }
 
-async function checkState(){
-  try{
-    const d=await sessionInfo();
-    const connected=d?.connected===true||d?.status==="connected"||d?.session?.connected===true;
-    const state=connected?"CONNECTED":"DISCONNECTED";
-    if(state!==lastState){lastState=state;console.log("[ROMA] Session "+state);}
-  }catch{
-    if(lastState!=="ERROR"){lastState="ERROR";console.log("[ROMA] Session status ERROR");}
-  }
-}
-
-async function poll(){
-  if(busy)return;
-  busy=true;
-  try{
-    const d=await getMessages(cursor);
-    if(d?.success===false)throw new Error(d.error||"message API error");
-    for(const m of d?.messages||[]){try{await handle(m)}catch(e){console.error("[ROMA] command error:",e?.message||e)}}
-    if(Number.isFinite(Number(d?.cursor)))cursor=Math.max(cursor,Number(d.cursor));
-  }catch(e){console.error("[ROMA] poll error:",e?.message||e)}
-  finally{busy=false;}
-}
-
 async function main(){
   plugins=await loadPlugins();
-  console.log("[ROMA] Bot started");
-  console.log("[ROMA] Mode: "+config.mode+" • Plugins: "+plugins.length);
-  await checkState();
-  await poll();
-  setInterval(poll,1500);
-  setInterval(checkState,5000);
+  startWebServer();
+  onMessage(handle);
+  await startWhatsApp();
+  console.log("[ROMA] Bot started • Plugins: "+plugins.length);
 }
 main().catch(e=>{console.error("[ROMA] Fatal:",e);process.exit(1)});
