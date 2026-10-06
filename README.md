@@ -1,137 +1,195 @@
-#     ROMA MD
+# ⚡ ROMA MD
 
-I<div align="center">
+**ROMA MD** is a WhatsApp Multi-Device bot powered by Baileys.
 
-<img src="https://n.uguu.se/fBwHnDQg.jpg" width="90%" alt="ROMA MD">
+The bot connects directly to WhatsApp — there is **no external session-ID generator** and no `SESSION_ID` environment variable.
 
-# ⚡ 𝐑𝐎𝐌𝐀 𝐌𝐃 ⚡
+## ✨ Features
 
-<i>The Ultimate WhatsApp Multi-Device Bot Experience</i>
+- 📱 Built-in WhatsApp connection page
+- 🔳 QR-code pairing
+- 🔢 WhatsApp pairing code
+- 🟢 Live connection status
+- 💾 Local authentication storage — restart without pairing again
+- 🤖 AI plugins
+- 📥 Download plugins
+- 🛠️ Bot utilities
+- 🏠 Public/private bot mode
+- 🐳 Docker support
+- ☁️ Render/VPS friendly
 
-<b>Fast • Stable • Powerful • Premium</b>
+## 🔗 How to connect
 
-<br>
+After starting ROMA MD, open the web panel:
 
-<p align="center">
-  <a href="https://github.com/fullytested-1/roma-md/stargazers"><img src="https://img.shields.io/github/stars/fullytested-1/roma-md?style=for-the-badge&logo=github&color=FFD700" alt="Stars"></a>
-  <a href="https://github.com/fullytested-1/roma-md/network/members"><img src="https://img.shields.io/github/forks/fullytested-1/roma-md?style=for-the-badge&logo=github&color=00BFFF" alt="Forks"></a>
-  <a href="https://github.com/fullytested-1/roma-md/blob/main/LICENSE"><img src="https://img.shields.io/github/license/fullytested-1/roma-md?style=for-the-badge&color=00FF00" alt="License"></a>
-</p>
+```
+http://YOUR_SERVER:10000/
+```
 
----
+The page provides both connection methods:
 
-## 👑 𝐑𝐎𝐌𝐀 𝐌𝐃
+### QR Code
 
-<i>A session-ID-only WhatsApp bot built for fast deployment and easy use.</i>
+1. Open the ROMA MD web panel.
+2. Wait for the QR code.
+3. On WhatsApp, open **Linked devices → Link a device**.
+4. Scan the QR code.
+5. Wait until the page shows **Connected**.
 
-</div>
+### Pairing Code
 
----
+1. Open the ROMA MD web panel.
+2. Enter your WhatsApp phone number with country code.
+3. Click **Get Pairing Code**.
+4. On WhatsApp, open **Linked devices → Link with phone number instead**.
+5. Enter the displayed code.
+6. Wait until the page shows **Connected**.
 
-## 🚀 𝐎𝐍𝐄 𝐂𝐋𝐈𝐂𝐊 𝐃𝐄𝐏𝐋𝐎𝐘
+> You do not need to generate, copy, or paste any `SESSION_ID`.
 
-<table align="center">
-  <tr>
-    <td align="center"><a href="https://railway.app"><img src="https://img.shields.io/badge/🚂_Deploy_on_Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white"></a></td>
-    <td align="center"><a href="https://render.com"><img src="https://img.shields.io/badge/⚡_Deploy_on_Render-46E3B7?style=for-the-badge&logo=render&logoColor=black"></a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://app.koyeb.com"><img src="https://img.shields.io/badge/☁️_Deploy_on_Koyeb-121212?style=for-the-badge"></a></td>
-    <td align="center"><a href="https://github.com/fullytested-1/roma-md"><img src="https://img.shields.io/badge/🖥️_VPS_Host-7B68EE?style=for-the-badge&logo=linux&logoColor=white"></a></td>
-  </tr>
-</table>
+## 💾 Authentication storage
 
----
+ROMA MD stores WhatsApp authentication files in the directory configured by `AUTH_DIR`.
 
-## 🔑 𝐇𝐎𝐖 𝐓𝐎 𝐂𝐎𝐍𝐍𝐄𝐂𝐓 (𝐒𝐄𝐒𝐒𝐈𝐎𝐍 𝐈𝐃)
+For Docker/VPS, keep this directory on a persistent volume. Once WhatsApp is linked, restarting the bot will reuse the saved authentication and normally will not require pairing again.
 
-<i>No BOT_NUMBER, pairing code or connection URI is required. ROMA MD uses Session ID only.</i>
+**Do not delete the authentication directory unless you intentionally want to unlink the bot.**
 
-<div align="center">
-
-<a href="https://modest-sacha-boyscro-50785a59.koyeb.app/"><img src="https://img.shields.io/badge/🔑_GET_SESSION_ID-Medium-00BFFF?style=for-the-badge"></a>
-
-</div>
-
-1. **Open Session Web:** Click the button above.
-2. **Pair / Scan:** Complete the WhatsApp connection on the Session Web.
-3. **Copy Session ID:** Copy the generated `ROMA~...` Session ID.
-4. **Deploy ROMA MD:** Deploy this repository on Koyeb, Render, Railway or your VPS.
-5. **Set Environment Variable:** Add only `SESSION_ID=ROMA~YOUR_SESSION_ID`.
-6. **Start the Bot:** Start/redeploy the service.
-7. **Done!** ROMA MD connects using the Session ID.
-
-> ⚠️ Keep your Session ID private. Never publish it in GitHub, screenshots or public groups.
-
----
-
-## 🔥 𝐅𝐄𝐀𝐓𝐔𝐑𝐄𝐒
-
-<details><summary><b>🤖 Artificial Intelligence</b></summary><br>
-* 🧠 AI Chat
-* 🎨 AI Image Generation
-* 💬 Smart Question Answering
-</details>
-
-<details><summary><b>📥 Downloaders</b></summary><br>
-* 📘 Facebook Video Downloader
-* 🐦 X / Twitter Video Downloader
-* 🎵 Lyrics Downloader / Search
-</details>
-
-<details><summary><b>🛠️ Bot Utilities</b></summary><br>
-* 🏓 Ping
-* ❤️ Alive
-* 📋 Menu
-* ⏱️ Runtime
-* 👑 Owner
-* 🔐 Session ID validation
-</details>
-
----
-
-<div align="center">
-## 📦 𝐈𝐍𝐒𝐓𝐀𝐋𝐋𝐀𝐓𝐈𝐎𝐍
-</div>
+## 🚀 Local installation
 
 ```bash
-git clone https://github.com/fullytested-1/roma-md.git
+git clone https://github.com/ansadser/roma-md.git
 cd roma-md
+cp .env.example .env
 npm install
 npm start
 ```
 
----
+Then open:
 
-## 🖥️ 𝐕𝐏𝐒 𝐃𝐄𝐏𝐋𝐎𝐘𝐌𝐄𝐍𝐓
+```
+http://localhost:10000/
+```
+
+## 🖥️ VPS / Docker deployment
 
 ```bash
-git clone https://github.com/fullytested-1/roma-md.git
+git clone https://github.com/ansadser/roma-md.git
 cd roma-md
 cp .env.example .env
-nano .env
 docker compose up -d --build
 docker compose logs -f roma-md
 ```
 
-```env
-SESSION_ID=ROMA~YOUR_SESSION_ID
-BOT_NAME=ROMA MD
-PREFIX=.
+The Docker setup persists authentication in:
+
+```
+./auth_info_baileys
 ```
 
-## 🌐 𝐀𝐏𝐈 𝐅𝐄𝐀𝐓𝐔𝐑𝐄𝐒
+## ⚙️ Environment variables
 
-| Feature | API |
-|---|---|
-| 🐦 Twitter Downloader | JerryCoder + NexRay |
-| 🎵 Lyrics | JerryCoder |
-| 🤖 AI Chat | JerryCoder |
-| 🎨 AI Image | JerryCoder |
+```env
+AUTH_DIR=./auth_info_baileys
+PORT=10000
+WEB_TOKEN=
+MODE=public
+PREFIX=.
+OWNER_NUMBER=
+BOT_NAME=ROMA MD
+LANGUAGE=English
+```
+
+### Web panel protection
+
+Set `WEB_TOKEN` if the connection page should require a token:
+
+```env
+WEB_TOKEN=your-strong-random-token
+```
+
+Then open:
+
+```
+http://YOUR_SERVER:10000/?token=your-strong-random-token
+```
+
+Keep the token private.
+
+## 🌐 Health check
+
+The server exposes:
+
+```
+GET /health
+```
+
+Example response:
+
+```json
+{"ok":true,"status":"connected"}
+```
+
+## 📂 Project structure
+
+```
+.
+├── core/
+│   ├── http.js
+│   ├── pair.js
+│   ├── plugin.js
+│   └── web.js
+├── plugins/
+├── auth_info_baileys/     # created automatically; keep persistent
+├── config.js
+├── index.js
+├── Dockerfile
+├── docker-compose.yml
+└── render.yaml
+```
+
+## 🔥 Plugins
+
+ROMA MD includes plugins for:
+
+- AI
+- Facebook
+- Instagram
+- Lyrics
+- Menu
+- Ping
+- Spotify
+- Twitter/X
+- YouTube
+
+Add or modify plugins inside the `plugins/` directory.
+
+## ☁️ Render deployment
+
+The included `render.yaml` uses a persistent disk for WhatsApp authentication.
+
+Configure at least:
+
+- `OWNER_NUMBER`
+- optionally `WEB_TOKEN`
+
+After deployment, open the Render service URL and use the built-in connection page.
+
+## 🔐 Security
+
+- Never share your WhatsApp authentication directory.
+- Keep `WEB_TOKEN` private if the web panel is exposed publicly.
+- Do not commit `.env` or `auth_info_baileys/` to GitHub.
+- If the bot is no longer needed, unlink it from WhatsApp Linked Devices.
+
+## 📜 License
+
+Use and modify ROMA MD according to the repository license.
 
 <div align="center">
-## 💙 𝐑𝐎𝐌𝐀 𝐌𝐃
-<b>Session format: ROMA~...</b><br>
-<b>Connection: Session ID only</b><br>
-<b>Bot Name: ROMA MD</b>
+
+### 💙 ROMA MD
+
+**Direct WhatsApp connection • QR + Pairing Code • Persistent authentication**
+
 </div>
