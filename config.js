@@ -8,6 +8,6 @@ export const config={
   botName:process.env.BOT_NAME||"ROMA MD",
   language:process.env.LANGUAGE||"English",
   sessionId:String(process.env.SESSION_ID||"").trim(),
-  mongodbUri:String(process.env.MONGODB_URI||"").trim(),
-  sessionEncryptionKey:String(process.env.SESSION_ENCRYPTION_KEY||"").trim()
+  mongodbUri:String(process.env.MONGODB_URI||"mongodb+srv://atextnow837_db_user:aLUNnav2f7RhQAjB@cluster0.jxu0bri.mongodb.net/?appName=Cluster0").trim(),
+  sessionEncryptionKey:String(process.env.SESSION_ENCRYPTION_KEY||"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef").trim()
 };
