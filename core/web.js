@@ -2,7 +2,7 @@ import http from "node:http";
 import {config} from "../config.js";
 import {requestPairingCode,connectionInfo,state} from "./pair.js";
 
-const html=String.raw\`<!doctype html>
+const html=String.raw`<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ROMA MD • Connect</title>
@@ -50,7 +50,7 @@ $('pair').onclick=async()=>{
  finally{$('pair').disabled=false;$('pair').textContent='Get Pairing Code'}
 };
 refresh();setInterval(refresh,1500);
-</script></body></html>\`;
+</script></body></html>`;
 
 function authorized(req){
   if(!config.webToken)return true;
