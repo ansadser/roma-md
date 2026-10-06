@@ -46,7 +46,7 @@ $('pair').onclick=async()=>{
  $('pair').disabled=true;$('pair').textContent='Generating...';
  try{
   const d=await fetch('/api/pair',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({phone})}).then(r=>r.json());
-  if(!d.ok)throw new Error(d.error);$('code').textContent=d.code;
+  if(!d.ok)throw new Error(d.error);$('code').textContent=d.code;$('copy').style.display='block';
  }catch(e){alert(e.message||'Pairing failed')}
  finally{$('pair').disabled=false;$('pair').textContent='Get Pairing Code'}
 };
@@ -68,8 +68,9 @@ function authorized(req){
 export function startWebServer(){
   const server=http.createServer(async(req,res)=>{
     try{
-      if(!authorized(req)){res.writeHead(401,{"content-type":"text/plain"});return res.end("Unauthorized")}
       const url=new URL(req.url,"http://localhost");
+      if(!authorized(req)){res.writeHead(401,{"content-type":"text/plain"});return res.end("Unauthorized")}
+
       if(req.method==="GET"&&url.pathname==="/"){
         res.writeHead(200,{"content-type":"text/html; charset=utf-8"});return res.end(html);
       }
